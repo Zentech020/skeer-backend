@@ -7,6 +7,10 @@ var base = new Airtable({ apiKey: 'keyc1rvSQz8HDN9rU' }).base('appEhDJ5yusT5vDou
 
 
 
+app.get('/', (req, res) => {
+  res.send('hello 👋🏼');
+})
+
 app.get('/list', (req, res) => {
   let items = [];
   base('list').select({
