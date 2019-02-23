@@ -5,9 +5,12 @@ var _ = require('lodash');
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyc1rvSQz8HDN9rU' }).base('appEhDJ5yusT5vDou');
 
+app.set('port', (process.env.PORT || 5000))
+
 
 
 app.get('/', (req, res) => {
+  console.log('starting');
   res.send('hello 👋🏼');
 })
 
@@ -56,6 +59,6 @@ app.get('/test', (req, res) => {
   }
 })
 
-app.listen(5000, () => {
-  console.log('listen to port 5000');
+app.listen(app.get('port'), function () {
+  console.log("Node app is running at localhost:" + app.get('port'))
 })
