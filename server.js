@@ -76,23 +76,27 @@ app.get('/list/:query', (req, res) => {
   });
 })
 
-app.post('/match/', (req, res) => {
-  const list = ["Ariel", "Pelle", "Steije"];
+app.post('/match', (req, res) => {
+  let matchItems = req.body.items;
+  let allItems = [];
+  base('list').select({
+    view: "Grid view"
+  }).eachPage(function page(records, fetchNextPage) {
+    fetchNextPage();
+    records.map(item => {
+      // console.log(item);
+      allItems.push(item);
+    });
 
-  const match = [];
-  for (var i = 0; i < req.body.products.length; i++) {
-    for (var j = 0; j < list.length; j++) {
-      if (req.body.products[i].title === list[j]) {
-        match.push(req.body.products[i]);
-      }
-    }
-  }
-
-  res.send(match);
-
+  }, function done(err) {
+    if (err) { console.error(err); return; }
+    console.log(allItems);
+    const matchingItems = allItems.filter(item => matchItems.includes(item.get("Name")))
+      .map(item => item.id)
+    res.send(matchingItems);
+  });
 })
 
 app.listen(app.get('port'), function () {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
-
