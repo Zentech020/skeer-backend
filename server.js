@@ -1,34 +1,60 @@
 var express = require('express');
 const app = express();
 var _ = require('lodash');
+var bodyParser = require('body-parser');
+
 
 var Airtable = require('airtable');
 var base = new Airtable({ apiKey: 'keyc1rvSQz8HDN9rU' }).base('appEhDJ5yusT5vDou');
 
 app.set('port', (process.env.PORT || 5000))
 
+app.use(bodyParser());
 
 
 app.get('/', (req, res) => {
   console.log('starting');
-  res.send('hello 👋🏼');
+  res.send('👋🏼  🌎');
 })
 
 app.get('/list', (req, res) => {
   let items = [];
   base('list').select({
-    maxRecords: 10,
+    view: "Grid view"
   }).eachPage(function page(records, fetchNextPage) {
-    // This function (`page`) will get called for each page of records.
-
-    // const results = records.map((item) => items.push(item.get('Name'))
     const result = records.map((item) => {
       items.push(item.get('Name'));
     });
-    res.send(items);
+
+    fetchNextPage();
 
   }, function done(err) {
     if (err) { console.error(err); return; }
+    res.send(items);
+  });
+})
+
+app.get('/list/:query', (req, res) => {
+  let items = [];
+  base('list').select({
+    view: "Grid view"
+  }).eachPage(function page(records, fetchNextPage) {
+    const result = records.map((item) => {
+      items.push(item.get('Name'));
+    });
+
+    fetchNextPage();
+
+  }, function done(err) {
+    if (err) { console.error(err); return; }
+    let filteredItems = items;
+    if (req.params.query) {
+      console.log(req.params.query);
+      filteredItems = items.filter(item => {
+        return item.toLowerCase().includes(req.params.query.toLowerCase());
+      })
+    }
+    res.send(filteredItems);
   });
 })
 
@@ -50,15 +76,23 @@ app.get('/list/:query', (req, res) => {
   });
 })
 
-app.get('/test', (req, res) => {
-  if ('Remia' == 'Remia') {
-    console.log('true')
+app.post('/match/', (req, res) => {
+  const list = ["Ariel", "Pelle", "Steije"];
+
+  const match = [];
+  for (var i = 0; i < req.body.products.length; i++) {
+    for (var j = 0; j < list.length; j++) {
+      if (req.body.products[i].title === list[j]) {
+        match.push(req.body.products[i]);
+      }
+    }
   }
-  else {
-    console.log('false');
-  }
+
+  res.send(match);
+
 })
 
 app.listen(app.get('port'), function () {
   console.log("Node app is running at localhost:" + app.get('port'))
 })
+
