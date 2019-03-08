@@ -79,20 +79,19 @@ app.get('/list/:query', (req, res) => {
 app.post('/match', (req, res) => {
   let matchItems = req.body.items;
   let allItems = [];
-  base('list').select({
+  base('discounts').select({
     view: "Grid view"
   }).eachPage(function page(records, fetchNextPage) {
     fetchNextPage();
     records.map(item => {
-      // console.log(item);
+      console.log(item);
       allItems.push(item);
     });
 
   }, function done(err) {
     if (err) { console.error(err); return; }
     console.log(allItems);
-    const matchingItems = allItems.filter(item => matchItems.includes(item.get("Name")))
-      .map(item => item.id)
+    const matchingItems = allItems.filter(item => matchItems.includes(item.get("Name")));
     res.send(matchingItems);
   });
 })
