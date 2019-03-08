@@ -82,16 +82,16 @@ app.post('/match', (req, res) => {
   base('discounts').select({
     view: "Grid view"
   }).eachPage(function page(records, fetchNextPage) {
-    fetchNextPage();
+
     records.map(item => {
-      console.log(item);
-      allItems.push(item);
+      allItems.push(item.fields);
     });
+
+    fetchNextPage();
 
   }, function done(err) {
     if (err) { console.error(err); return; }
-    console.log(allItems);
-    const matchingItems = allItems.filter(item => matchItems.includes(item.get("Name")));
+    const matchingItems = allItems.filter(item => matchItems.includes(item.Name));
     res.send(matchingItems);
   });
 })
