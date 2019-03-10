@@ -77,7 +77,7 @@ app.get('/list/:query', (req, res) => {
 })
 
 app.post('/match', (req, res) => {
-  let matchItems = req.body.items;
+  let requestedDiscounts = req.body.items;
   let allItems = [];
   base('discounts').select({
     view: "Grid view"
@@ -91,9 +91,13 @@ app.post('/match', (req, res) => {
 
   }, function done(err) {
     if (err) { console.error(err); return; }
-    const matchingItems = allItems.filter(item => matchItems.includes(item.Name));
+    const matchingItems = allItems.filter(item =>
+      requestedDiscounts.some(requestedDiscount => 
+        (new RegExp(requestedDiscount, "i").test(item.Name))
+      )
+    )
     res.send(matchingItems);
-  });
+  })
 })
 
 app.listen(app.get('port'), function () {
